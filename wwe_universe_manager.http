@@ -1,0 +1,6 @@
+@wwe_universe_manager_HostAddress = http://localhost:5037
+
+GET {{wwe_universe_manager_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
