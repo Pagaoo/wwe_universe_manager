@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using wwe_universe_manager.Dto.Wrestler;
 using wwe_universe_manager.Models;
 using wwe_universe_manager.Services.Wrestler;
 
@@ -27,6 +28,13 @@ namespace wwe_universe_manager.Controllers
         public async Task<ActionResult<WrestlerModel>> GetWrestlerById(long wrestlerId)
         {
             var wrestler = await _wrestlerInterface.GetWrestlerById(wrestlerId);
+            return Ok(wrestler);
+        }
+
+        [HttpPost("CreateWrestler")]
+        public async Task<ActionResult<WrestlerModel>> CreateWrestler(WrestlerDto wrestlerDto)
+        {
+            var wrestler = await _wrestlerInterface.CreateWrestler(wrestlerDto);
             return Ok(wrestler);
         }
     }
