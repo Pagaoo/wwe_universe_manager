@@ -13,7 +13,7 @@ namespace wwe_universe_manager.Services.Wrestler
             _appDbContext = appDbContext;
         }
 
-        public async Task<ResponseModel<WrestlerModel>> CreateWrestler(WrestlerDto wrestlerDto)
+        public async Task<ResponseModel<WrestlerModel>> CreateWrestler(CreateWrestlerDto wrestlerDto)
         {
             ResponseModel<WrestlerModel> response = new ResponseModel<WrestlerModel>();
 
@@ -42,6 +42,41 @@ namespace wwe_universe_manager.Services.Wrestler
                 response.Status = false;
                 return response;
             }
+        }
+
+        public async Task<ResponseModel<WrestlerModel>> DeleteWrestler(long wrestlerId)
+        {
+            ResponseModel<WrestlerModel> response = new ResponseModel<WrestlerModel>();
+
+            try
+            {
+                var wrestlerToDelete = await _appDbContext.Wrestler.FirstOrDefaultAsync(wrestlerToDelete => wrestlerToDelete.Id == wrestlerId);
+                if (wrestlerToDelete == null)
+                {
+                    response.Message = "Wrestler not found to delete";
+                    response.Status= false;
+                    return response;
+                }
+
+                _appDbContext.Remove(wrestlerToDelete);
+                await _appDbContext.SaveChangesAsync();
+
+                response.Data = wrestlerToDelete;
+                response.Message = "Wrestler deleted";
+                response.Status = true;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.Status = false;
+                return response;
+            }
+        }
+
+        public async Task<ResponseModel<WrestlerModel>> EditWrestlerInfos(EditWrestlerDto wrestlerDto)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<ResponseModel<WrestlerModel>> GetWrestlerById(long wrestlerId)

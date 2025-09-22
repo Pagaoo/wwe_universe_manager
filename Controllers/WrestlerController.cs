@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using wwe_universe_manager.Dto.Wrestler;
 using wwe_universe_manager.Models;
 using wwe_universe_manager.Services.Wrestler;
@@ -17,6 +15,8 @@ namespace wwe_universe_manager.Controllers
             _wrestlerInterface = wrestlerInterface;
         }
 
+        //TODO: Futuramente refatorar as rotas para seguir o padrão REST
+
         [HttpGet("ListWreslers")]
         public async Task<ActionResult<ResponseModel<List<WrestlerModel>>>> ListWrestlers()
         {
@@ -32,10 +32,23 @@ namespace wwe_universe_manager.Controllers
         }
 
         [HttpPost("CreateWrestler")]
-        public async Task<ActionResult<WrestlerModel>> CreateWrestler(WrestlerDto wrestlerDto)
+        public async Task<ActionResult<WrestlerModel>> CreateWrestler(CreateWrestlerDto wrestlerDto)
         {
             var wrestler = await _wrestlerInterface.CreateWrestler(wrestlerDto);
             return Ok(wrestler);
+        }
+
+        [HttpDelete("DeleteWrestler/{wrestlerId}")]
+        public async Task<ActionResult<WrestlerModel>> DeleteWrestler(long wrestlerId)
+        {
+            var wrestlerToDelete = await _wrestlerInterface.DeleteWrestler(wrestlerId);
+
+            if (!wrestlerToDelete.Status)
+            {
+                return NotFound(wrestlerToDelete);
+            }
+
+            return Ok(wrestlerToDelete);
         }
     }
 }
