@@ -23,7 +23,7 @@ namespace wwe_universe_manager.Controllers
             return Ok(wrestlers);
         }
 
-        [HttpGet("GetWrestlerById")]
+        [HttpGet("GetWrestlerById/{wrestlerId}")]
         public async Task<ActionResult<WrestlerModel>> GetWrestlerById(long wrestlerId)
         {
             var wrestler = await _wrestlerInterface.GetWrestlerById(wrestlerId);
