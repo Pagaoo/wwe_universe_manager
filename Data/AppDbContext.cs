@@ -26,9 +26,10 @@ namespace wwe_universe_manager.Data
         }
 
         public void OnBeforeSaving()
-        {
+        {            
             var entries = ChangeTracker.Entries().Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
             var utcNow = DateTimeOffset.UtcNow;
+
             foreach (var entry in entries)
             {
                 if (entry.Entity is IAuditable entity)

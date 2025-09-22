@@ -1,4 +1,5 @@
-﻿using wwe_universe_manager.Models;
+﻿using wwe_universe_manager.Dto.Wrestler;
+using wwe_universe_manager.Models;
 
 namespace wwe_universe_manager.Services.Wrestler
 {
@@ -6,5 +7,6 @@ namespace wwe_universe_manager.Services.Wrestler
     {
         Task<ResponseModel<List<WrestlerModel>>> ListWrestlers();
         Task<ResponseModel<WrestlerModel>> GetWrestlerById(long wrestlerId);
+        Task<ResponseModel<WrestlerModel>> CreateWrestler(WrestlerDto wrestlerDto);
     }
 }
