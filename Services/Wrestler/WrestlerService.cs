@@ -12,9 +12,29 @@ namespace wwe_universe_manager.Services.Wrestler
             _appDbContext = appDbContext;
         }
 
-        public Task<ResponseModel<WrestlerModel>> GetWrestlerById(long wrestlerId)
+        public async Task<ResponseModel<WrestlerModel>> GetWrestlerById(long wrestlerId)
         {
-            throw new NotImplementedException();
+            ResponseModel<WrestlerModel> response = new ResponseModel<WrestlerModel>();
+            
+            try
+            {
+                var wrestler = await _appDbContext.Wrestler.FirstOrDefaultAsync(wrestler => wrestler.Id == wrestlerId);
+                if (wrestler == null)
+                {
+                    response.Message = "Wrestler not found";
+                    return response;
+                }
+                response.Data = wrestler;
+                response.Message = "Wrestler found";
+                return response;
+
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.Status = false;
+                return response;
+            }
         }
 
         public async Task<ResponseModel<List<WrestlerModel>>> ListWrestlers()
