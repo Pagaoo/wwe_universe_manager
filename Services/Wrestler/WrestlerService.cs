@@ -43,23 +43,6 @@ namespace wwe_universe_manager.Services.Wrestler
             return wrestlerToDelete;
         }
 
-        public async Task<WrestlerModel?> EditWrestlerInfos(long id, EditWrestlerDto wrestlerDto)
-        {
-            var wrestlerToEdit = await _appDbContext.Wrestler.FirstOrDefaultAsync(wrestlerToEdit => wrestlerToEdit.Id == id);
-
-            if (wrestlerToEdit == null)
-            {
-                return null;
-            }
-
-            wrestlerToEdit.Name = wrestlerDto.Name;
-            wrestlerToEdit.Weight = wrestlerDto.Weight;
-            wrestlerToEdit.Height = wrestlerDto.Height;
-
-            await _appDbContext.SaveChangesAsync();
-            return wrestlerToEdit;
-        }
-
         public async Task<WrestlerModel?> FindWrestlerById(long wrestlerId)
         {
             return await _appDbContext.Wrestler.FirstOrDefaultAsync(wrestler => wrestler.Id == wrestlerId);
@@ -69,6 +52,11 @@ namespace wwe_universe_manager.Services.Wrestler
         {
             var wrestlers = await _appDbContext.Wrestler.ToListAsync();
             return wrestlers;
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _appDbContext.SaveChangesAsync();
         }
     }
 }
