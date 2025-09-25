@@ -74,9 +74,38 @@ namespace wwe_universe_manager.Services.Wrestler
             }
         }
 
-        public async Task<ResponseModel<WrestlerModel>> EditWrestlerInfos(EditWrestlerDto wrestlerDto)
+        public async Task<ResponseModel<WrestlerModel>> EditWrestlerInfos(long id, EditWrestlerDto wrestlerDto)
         {
-            throw new NotImplementedException();
+            ResponseModel<WrestlerModel> response = new ResponseModel<WrestlerModel>();
+
+            try
+            {
+                var wrestlerToEdit = await _appDbContext.Wrestler.FirstOrDefaultAsync(wrestlerToEdit => wrestlerToEdit.Id == id);
+                if (wrestlerToEdit == null)
+                {
+                    response.Message = "Wrestler not found to edit";
+                    response.Status = false;
+                    return response;
+                }
+
+                
+                wrestlerToEdit.Name = wrestlerDto.Name;
+                wrestlerToEdit.Weight = wrestlerDto.Weight;
+                wrestlerToEdit.Height = wrestlerDto.Height;
+
+                await _appDbContext.SaveChangesAsync();
+
+                response.Data = wrestlerToEdit;
+                response.Message = "Wrestler updated";
+                response.Status = true;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.Status = false;
+                return response;
+            }
         }
 
         public async Task<ResponseModel<WrestlerModel>> GetWrestlerById(long wrestlerId)

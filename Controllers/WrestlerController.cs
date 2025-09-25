@@ -50,5 +50,18 @@ namespace wwe_universe_manager.Controllers
 
             return Ok(wrestlerToDelete);
         }
+
+        [HttpPatch("UpdateWrestler/{id}")]
+        public async Task<ActionResult<WrestlerModel>> UpdateWrestler(long id, [FromBody] EditWrestlerDto editWrestlerDto)
+        {
+            var wrestlerToEdit = await _wrestlerInterface.EditWrestlerInfos(id, editWrestlerDto);
+
+            if(!wrestlerToEdit.Status)
+            {
+                return NotFound(wrestlerToEdit);
+            }
+
+            return Ok(wrestlerToEdit);
+        }
     }
 }
