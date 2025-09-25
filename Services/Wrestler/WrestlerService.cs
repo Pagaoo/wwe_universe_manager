@@ -13,143 +13,62 @@ namespace wwe_universe_manager.Services.Wrestler
             _appDbContext = appDbContext;
         }
 
-        public async Task<ResponseModel<WrestlerModel>> CreateWrestler(CreateWrestlerDto wrestlerDto)
+        public async Task<WrestlerModel> CreateWrestler(CreateWrestlerDto wrestlerDto)
         {
-            ResponseModel<WrestlerModel> response = new ResponseModel<WrestlerModel>();
-
-            try
+            var wrestler = new WrestlerModel()
             {
-                var wrestler = new WrestlerModel()
-                {
-                    Name = wrestlerDto.Name,
-                    Height = wrestlerDto.Height,
-                    Weight = wrestlerDto.Weight,
-                    BirthDate = wrestlerDto.BirthDate
-                };
+                Name = wrestlerDto.Name,
+                Height = wrestlerDto.Height,
+                Weight = wrestlerDto.Weight,
+                BirthDate = wrestlerDto.BirthDate
+            };
 
-                _appDbContext.Add(wrestler);
-                await _appDbContext.SaveChangesAsync();
+            _appDbContext.Add(wrestler);
+            await _appDbContext.SaveChangesAsync();
 
-                response.Data = wrestler;
-                response.Message = "Wrestler successfully created";
-                response.Status = true;
-                return response;
-
-            }
-            catch (Exception ex)
-            {
-                response.Message = ex.Message;
-                response.Status = false;
-                return response;
-            }
+            return wrestler;
         }
 
-        public async Task<ResponseModel<WrestlerModel>> DeleteWrestler(long wrestlerId)
+        public async Task<WrestlerModel?> DeleteWrestler(long wrestlerId)
         {
-            ResponseModel<WrestlerModel> response = new ResponseModel<WrestlerModel>();
-
-            try
-            {
-                var wrestlerToDelete = await _appDbContext.Wrestler.FirstOrDefaultAsync(wrestlerToDelete => wrestlerToDelete.Id == wrestlerId);
-                if (wrestlerToDelete == null)
-                {
-                    response.Message = "Wrestler not found to delete";
-                    response.Status= false;
-                    return response;
-                }
-
-                _appDbContext.Remove(wrestlerToDelete);
-                await _appDbContext.SaveChangesAsync();
-
-                response.Data = wrestlerToDelete;
-                response.Message = "Wrestler deleted";
-                response.Status = true;
-                return response;
-            }
-            catch (Exception ex)
-            {
-                response.Message = ex.Message;
-                response.Status = false;
-                return response;
-            }
-        }
-
-        public async Task<ResponseModel<WrestlerModel>> EditWrestlerInfos(long id, EditWrestlerDto wrestlerDto)
-        {
-            ResponseModel<WrestlerModel> response = new ResponseModel<WrestlerModel>();
-
-            try
-            {
-                var wrestlerToEdit = await _appDbContext.Wrestler.FirstOrDefaultAsync(wrestlerToEdit => wrestlerToEdit.Id == id);
-                if (wrestlerToEdit == null)
-                {
-                    response.Message = "Wrestler not found to edit";
-                    response.Status = false;
-                    return response;
-                }
-
-                
-                wrestlerToEdit.Name = wrestlerDto.Name;
-                wrestlerToEdit.Weight = wrestlerDto.Weight;
-                wrestlerToEdit.Height = wrestlerDto.Height;
-
-                await _appDbContext.SaveChangesAsync();
-
-                response.Data = wrestlerToEdit;
-                response.Message = "Wrestler updated";
-                response.Status = true;
-                return response;
-            }
-            catch (Exception ex)
-            {
-                response.Message = ex.Message;
-                response.Status = false;
-                return response;
-            }
-        }
-
-        public async Task<ResponseModel<WrestlerModel>> GetWrestlerById(long wrestlerId)
-        {
-            ResponseModel<WrestlerModel> response = new ResponseModel<WrestlerModel>();
+            var wrestlerToDelete = await _appDbContext.Wrestler.FirstOrDefaultAsync(wrestlerToDelete => wrestlerToDelete.Id == wrestlerId);
             
-            try
+            if (wrestlerToDelete == null)
             {
-                var wrestler = await _appDbContext.Wrestler.FirstOrDefaultAsync(wrestler => wrestler.Id == wrestlerId);
-                if (wrestler == null)
-                {
-                    response.Message = "Wrestler not found";
-                    return response;
-                }
-                response.Data = wrestler;
-                response.Message = "Wrestler found";
-                return response;
+                return null;
+            }
 
-            }
-            catch (Exception ex)
-            {
-                response.Message = ex.Message;
-                response.Status = false;
-                return response;
-            }
+            _appDbContext.Remove(wrestlerToDelete);
+            await _appDbContext.SaveChangesAsync();
+            return wrestlerToDelete;
         }
 
-        public async Task<ResponseModel<List<WrestlerModel>>> ListWrestlers()
+        public async Task<WrestlerModel?> EditWrestlerInfos(long id, EditWrestlerDto wrestlerDto)
         {
-            ResponseModel<List<WrestlerModel>> response = new ResponseModel<List<WrestlerModel>>();
-            
-            try
+            var wrestlerToEdit = await _appDbContext.Wrestler.FirstOrDefaultAsync(wrestlerToEdit => wrestlerToEdit.Id == id);
+
+            if (wrestlerToEdit == null)
             {
-                var wrestlers = await _appDbContext.Wrestler.ToListAsync();
-                response.Data = wrestlers;
-                response.Message = "All wrestlers were listed";
-                return response;
+                return null;
             }
-            catch (Exception ex)
-            {
-                response.Message = ex.Message;
-                response.Status = false;
-                return response;
-            }
+
+            wrestlerToEdit.Name = wrestlerDto.Name;
+            wrestlerToEdit.Weight = wrestlerDto.Weight;
+            wrestlerToEdit.Height = wrestlerDto.Height;
+
+            await _appDbContext.SaveChangesAsync();
+            return wrestlerToEdit;
+        }
+
+        public async Task<WrestlerModel?> FindWrestlerById(long wrestlerId)
+        {
+            return await _appDbContext.Wrestler.FirstOrDefaultAsync(wrestler => wrestler.Id == wrestlerId);
+        }
+
+        public async Task<List<WrestlerModel>> ListWrestlers()
+        {
+            var wrestlers = await _appDbContext.Wrestler.ToListAsync();
+            return wrestlers;
         }
     }
 }

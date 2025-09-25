@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Messaging;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc;
 using wwe_universe_manager.Dto.Wrestler;
 using wwe_universe_manager.Models;
 using wwe_universe_manager.Services.Wrestler;
@@ -15,50 +17,65 @@ namespace wwe_universe_manager.Controllers
             _wrestlerInterface = wrestlerInterface;
         }
 
-        //TODO: Futuramente refatorar as rotas para seguir o padrão REST
-
-        [HttpGet("ListWreslers")]
+        [HttpGet()]
         public async Task<ActionResult<ResponseModel<List<WrestlerModel>>>> ListWrestlers()
         {
             var wrestlers = await _wrestlerInterface.ListWrestlers();
             return Ok(wrestlers);
         }
 
-        [HttpGet("GetWrestlerById/{wrestlerId}")]
-        public async Task<ActionResult<WrestlerModel>> GetWrestlerById(long wrestlerId)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<WrestlerModel>> GetWrestlerById(long id)
         {
-            var wrestler = await _wrestlerInterface.GetWrestlerById(wrestlerId);
+            var wrestler = await _wrestlerInterface.FindWrestlerById(id);
+            if (wrestler == null)
+            {
+                return NotFound(new { message = "Wrestler not found!" });
+            }
+
             return Ok(wrestler);
         }
 
-        [HttpPost("CreateWrestler")]
+        [HttpPost()]
         public async Task<ActionResult<WrestlerModel>> CreateWrestler(CreateWrestlerDto wrestlerDto)
         {
             var wrestler = await _wrestlerInterface.CreateWrestler(wrestlerDto);
-            return Ok(wrestler);
+            return CreatedAtAction(nameof(GetWrestlerById), new { id = wrestler.Id }, wrestler);
         }
 
-        [HttpDelete("DeleteWrestler/{wrestlerId}")]
-        public async Task<ActionResult<WrestlerModel>> DeleteWrestler(long wrestlerId)
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<WrestlerModel>> DeleteWrestler(long id)
         {
-            var wrestlerToDelete = await _wrestlerInterface.DeleteWrestler(wrestlerId);
+            var wrestlerToDelete = await _wrestlerInterface.DeleteWrestler(id);
 
-            if (!wrestlerToDelete.Status)
+            if (wrestlerToDelete == null)
             {
-                return NotFound(wrestlerToDelete);
+                return NotFound();
             }
 
             return Ok(wrestlerToDelete);
         }
 
-        [HttpPatch("UpdateWrestler/{id}")]
-        public async Task<ActionResult<WrestlerModel>> UpdateWrestler(long id, [FromBody] EditWrestlerDto editWrestlerDto)
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<WrestlerModel>> UpdateWrestler(long id, [FromBody] JsonPatchDocument<WrestlerModel> patchDocument)
         {
-            var wrestlerToEdit = await _wrestlerInterface.EditWrestlerInfos(id, editWrestlerDto);
-
-            if(!wrestlerToEdit.Status)
+            if (patchDocument == null)
             {
-                return NotFound(wrestlerToEdit);
+                return BadRequest("Patch document cannot be null");
+            }
+
+            var wrestlerToEdit = await _wrestlerInterface.FindWrestlerById(id);
+
+            if(wrestlerToEdit == null)
+            {
+                return NotFound("Wrestler not found");
+            }
+
+            patchDocument.ApplyTo(wrestlerToEdit, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
 
             return Ok(wrestlerToEdit);
