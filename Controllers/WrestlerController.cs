@@ -1,5 +1,4 @@
-﻿using Azure.Messaging;
-using Microsoft.AspNetCore.JsonPatch;
+﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using wwe_universe_manager.Dto.Wrestler;
 using wwe_universe_manager.Models;
@@ -71,12 +70,17 @@ namespace wwe_universe_manager.Controllers
                 return NotFound("Wrestler not found");
             }
 
-            patchDocument.ApplyTo(wrestlerToEdit, ModelState);
+            patchDocument.ApplyTo(wrestlerToEdit, error =>
+            {
+                ModelState.AddModelError(string.Empty, error.ErrorMessage);
+            });
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+
+            await _wrestlerInterface.SaveChangesAsync();
 
             return Ok(wrestlerToEdit);
         }

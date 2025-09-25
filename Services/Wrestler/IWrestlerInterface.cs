@@ -8,7 +8,7 @@ namespace wwe_universe_manager.Services.Wrestler
         Task<List<WrestlerModel>> ListWrestlers();
         Task<WrestlerModel?> FindWrestlerById(long wrestlerId);
         Task<WrestlerModel> CreateWrestler(CreateWrestlerDto wrestlerDto);
-        Task<WrestlerModel?> EditWrestlerInfos(long id, EditWrestlerDto wrestlerDto);
         Task<WrestlerModel?> DeleteWrestler(long wrestlerId);
+        Task<int> SaveChangesAsync();
     }
 }
