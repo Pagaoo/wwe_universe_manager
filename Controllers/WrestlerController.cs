@@ -6,7 +6,7 @@ using wwe_universe_manager.Services.Wrestler;
 
 namespace wwe_universe_manager.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/wrestlers")]
     [ApiController]
     public class WrestlerController : ControllerBase
     {
