@@ -3,8 +3,9 @@
     public class CreateWrestlerDto
     {
         public required string Name { get; set; }
-        public int Height { get; set; }
-        public int Weight { get; set; }
+        public int HeightInFeet { get; set; }
+        public int HeightInInches { get; set; }
+        public int WeightInPounds { get; set; }
         public DateOnly BirthDate { get; set; }
     }
 }
