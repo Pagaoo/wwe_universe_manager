@@ -17,14 +17,14 @@ namespace wwe_universe_manager.Controllers
         }
 
         [HttpGet()]
-        public async Task<ActionResult<ResponseModel<List<WrestlerModel>>>> ListWrestlers()
+        public async Task<ActionResult<ResponseModel<List<ResponseWrestlerDto>>>> ListWrestlers()
         {
             var wrestlers = await _wrestlerInterface.ListWrestlers();
             return Ok(wrestlers);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<WrestlerModel>> GetWrestlerById(long id)
+        public async Task<ActionResult<ResponseWrestlerDto>> GetWrestlerById(long id)
         {
             var wrestler = await _wrestlerInterface.FindWrestlerById(id);
             if (wrestler == null)
@@ -63,7 +63,7 @@ namespace wwe_universe_manager.Controllers
                 return BadRequest("Patch document cannot be null");
             }
 
-            var wrestlerToEdit = await _wrestlerInterface.FindWrestlerById(id);
+            var wrestlerToEdit = await _wrestlerInterface.FindWrestlerModelById(id);
 
             if(wrestlerToEdit == null)
             {

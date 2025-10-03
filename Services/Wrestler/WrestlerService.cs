@@ -18,8 +18,9 @@ namespace wwe_universe_manager.Services.Wrestler
             var wrestler = new WrestlerModel()
             {
                 Name = wrestlerDto.Name,
-                Height = wrestlerDto.Height,
-                Weight = wrestlerDto.Weight,
+                HeightInFeet = wrestlerDto.HeightInFeet,
+                HeightInInches = wrestlerDto.HeightInInches,
+                WeightInPounds = wrestlerDto.WeightInPounds,
                 BirthDate = wrestlerDto.BirthDate
             };
 
@@ -43,14 +44,45 @@ namespace wwe_universe_manager.Services.Wrestler
             return wrestlerToDelete;
         }
 
-        public async Task<WrestlerModel?> FindWrestlerById(long wrestlerId)
+        public async Task<ResponseWrestlerDto?> FindWrestlerById(long wrestlerId)
+        {
+            var wrestler = await _appDbContext.Wrestler.FirstOrDefaultAsync(wrestler => wrestler.Id == wrestlerId);
+            
+            if(wrestler == null)
+            {
+                return null;
+            }
+
+            var wrestlerDto = new ResponseWrestlerDto
+            {
+                Id = wrestler.Id,
+                Name = wrestler.Name,
+                Age = wrestler.Age,
+                WeightInKg = wrestler.WeightInKg,
+                HeightInCm = wrestler.HeightInCm,
+                HeightFormatted = wrestler.HeightFormatted,
+            };
+
+            return wrestlerDto;
+        }
+
+        public async Task<WrestlerModel?> FindWrestlerModelById(long wrestlerId)
         {
             return await _appDbContext.Wrestler.FirstOrDefaultAsync(wrestler => wrestler.Id == wrestlerId);
         }
 
-        public async Task<List<WrestlerModel>> ListWrestlers()
+        public async Task<List<ResponseWrestlerDto>> ListWrestlers()
         {
-            var wrestlers = await _appDbContext.Wrestler.ToListAsync();
+            var wrestlers = await _appDbContext.Wrestler.Select(wrestler => new ResponseWrestlerDto
+            {
+                Id = wrestler.Id,
+                Name = wrestler.Name,
+                Age = wrestler.Age,
+                WeightInKg = wrestler.WeightInKg,
+                HeightInCm = wrestler.HeightInCm,
+                HeightFormatted = wrestler.HeightFormatted,
+            }).ToListAsync();
+
             return wrestlers;
         }
 
