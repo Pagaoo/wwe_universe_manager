@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using wwe_universe_manager.Interfaces;
 
 namespace wwe_universe_manager.Models
@@ -7,12 +8,9 @@ namespace wwe_universe_manager.Models
     {
         public long Id { get; set; }
         public required string Name { get; set; }
-        [JsonIgnore]
         public int HeightInFeet { get; set; }
-        [JsonIgnore]
         public int HeightInInches { get; set; }
-        [JsonIgnore]
-        public int WeightInPounds { get; set; }
+        public decimal WeightInPounds { get; set; }
         public DateOnly BirthDate { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset LastUpdatedAt { get; set; }
@@ -35,8 +33,8 @@ namespace wwe_universe_manager.Models
         {
             get
             {
-                const double poundsToKg = 0.45359237;
-                return Math.Round(WeightInPounds * poundsToKg, 2);
+                const decimal poundsToKg = 0.4535924m;
+                return (double)Math.Round(WeightInPounds * poundsToKg, 2);
             }
         }
 
@@ -49,12 +47,14 @@ namespace wwe_universe_manager.Models
             }
         }
 
-        public double HeightInCm
+        public int HeightInCm
         {
             get
             {
                 const double inchesToCm = 2.54;
-                return Math.Round(TotalHeightInInches * inchesToCm, 2);
+                double exactHeight = TotalHeightInInches * inchesToCm;
+                double roundedHeight = Math.Round(exactHeight, 2);
+                return (int)roundedHeight;
             }
         }
 
@@ -62,8 +62,38 @@ namespace wwe_universe_manager.Models
         {
             get
             {
-                return $"{HeightInFeet}' {HeightInInches}";
+                return $"{HeightInFeet}' {HeightInInches}''";
             }
         }
+
+        [NotMapped]
+        public double? WeightInKgToPounds
+        {
+            set
+            {
+                if (value.HasValue)
+                {
+                    const decimal kgToPounds = 2.20462262m;
+                    WeightInPounds = Math.Round((decimal)value.Value * kgToPounds, 4);
+                }
+            }
+        }
+
+        [NotMapped]
+        public int? HeightInCmToFeetAndInch
+        {
+            set
+            {
+                if (value.HasValue)
+                {
+                    const double cmToInch = 0.3937008;
+                    double totalInches = value.Value * cmToInch;
+
+                    HeightInFeet = (int)totalInches/12;
+                    HeightInInches = (int)Math.Round(totalInches % 12);
+                }
+            }
+        }
+
     }
 }
