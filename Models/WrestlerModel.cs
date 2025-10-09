@@ -43,7 +43,7 @@ namespace wwe_universe_manager.Models
         {
             get
             {
-                return (HeightInFeet * 12) + HeightInInches;
+                return HeightInFeet * 12 + HeightInInches;
             }
         }
 
